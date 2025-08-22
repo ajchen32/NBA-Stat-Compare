@@ -1,0 +1,66 @@
+# Read your CSV
+import pandas as pd
+import datetime
+df = pd.read_csv("nba_2025_games_october_to_june.csv")
+
+# Full NBA team abbreviation mapping
+team_abbr = {
+    "Atlanta Hawks": "ATL",
+    "Boston Celtics": "BOS",
+    "Brooklyn Nets": "BRK",
+    "Charlotte Hornets": "CHO",
+    "Chicago Bulls": "CHI",
+    "Cleveland Cavaliers": "CLE",
+    "Dallas Mavericks": "DAL",
+    "Denver Nuggets": "DEN",
+    "Detroit Pistons": "DET",
+    "Golden State Warriors": "GSW",
+    "Houston Rockets": "HOU",
+    "Indiana Pacers": "IND",
+    "Los Angeles Clippers": "LAC",
+    "Los Angeles Lakers": "LAL",
+    "Memphis Grizzlies": "MEM",
+    "Miami Heat": "MIA",
+    "Milwaukee Bucks": "MIL",
+    "Minnesota Timberwolves": "MIN",
+    "New Orleans Pelicans": "NOP",
+    "New York Knicks": "NYK",
+    "Oklahoma City Thunder": "OKC",
+    "Orlando Magic": "ORL",
+    "Philadelphia 76ers": "PHI",
+    "Phoenix Suns": "PHO",
+    "Portland Trail Blazers": "POR",
+    "Sacramento Kings": "SAC",
+    "San Antonio Spurs": "SAS",
+    "Toronto Raptors": "TOR",
+    "Utah Jazz": "UTA",
+    "Washington Wizards": "WAS"
+}
+
+# Function to construct Box Score URL
+def make_boxscore_url(row):
+    date_str = row['Date']  # e.g., "Thu, Apr 24, 2025"
+    home_team = row['Home/Neutral']  # column with home team
+    
+    # Parse the date
+    try:
+        dt = datetime.datetime.strptime(date_str, "%a, %b %d, %Y")
+    except:
+        return None  # in case of bad date
+    
+    y = dt.year
+    m = f"{dt.month:02d}"  # zero-padded month
+    d = f"{dt.day:02d}"    # zero-padded day
+    
+    abbr = team_abbr.get(home_team, "UNK")
+    
+    url = f"https://www.basketball-reference.com/boxscores/{y}{m}{d}0{abbr}.html"
+    return url
+
+# Apply to dataframe
+df['Box_Score_Link'] = df.apply(make_boxscore_url, axis=1)
+
+# Save back to CSV
+df.to_csv("NBA-Stat-Compare/nba_2025_games_with_links.csv", index=False)
+
+print(df[['Date', 'Home/Neutral', 'Box_Score_Link']].head())
