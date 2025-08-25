@@ -61,7 +61,16 @@ def get_team_tables(url, home_team_name, visitor_team_name, date_str):
 
     except Exception as e:
         print(f"Error fetching tables from {url}: {e}")
-        return None, None
+        time.sleep(20)
+        try:
+            tables = pd.read_html(url)
+            away_table = process_table(tables[0], visitor_team_name, home_team_name)
+            home_table = process_table(tables[8], home_team_name, visitor_team_name) if len(tables) >= 9 else None
+            
+            return away_table, home_table
+        except Exception as e2:
+            print("Failed again")
+            return None, None
 
 
 # --- Main loop for full season ---
@@ -90,7 +99,7 @@ for idx, row in df_season.iterrows():
 big_df = pd.concat(all_players, ignore_index=True)
 
 # Save as CSV
-output_file = "nba_2025_all_players_full_season_with_team_opp.csv"
+output_file = "NBA-Stat-Compare/nba_2025_all_players_full_season_all_games.csv"
 big_df.to_csv(output_file, index=False)
 
 print(f"Saved full season player data to {output_file}")
