@@ -17,7 +17,7 @@ cursor.execute("""
                team VARCHAR(3),
                opponent VARCHAR(3),
                player VARCHAR(35),
-               minutes VARCHAR(6),
+               minutes VARCHAR(20),
                FG INT,
                FGA INT,
                FGP DOUBLE,
@@ -42,11 +42,14 @@ cursor.execute("""
                """)
 # create nothing row
 data = []
-for row in df.itertuples(index = False, name = None):
-    if row[3] != "Reserves":
-        if not isinstance(row[5], str) or pd.isna(row[5]):
-
-            data.append(row)
+for row in df.iloc[2:].itertuples(index = False, name = None):
+    if row[3] != "Reserves" and not (isinstance(row[4], str) and len(row[4]) > 10 and (row[4][0:7] == "Did Not" or row[4][0:7] == "Not Wit" or row[4][0:8] == "Player S")):
+        new_row = tuple(
+            None if pd.isna(value) else value
+            for value in row[0:25]  # take only the first 25 columns
+        )
+        data.append(new_row)
+        print(new_row)
 
 cursor.executemany("""
     INSERT INTO season2425 (
