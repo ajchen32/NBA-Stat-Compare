@@ -1,11 +1,11 @@
 import pandas as pd
 import mysql.connector
 
-csv = ""
+csv = "NBA-Stat-Compare/nba_2025_all_players_full_season_all_games.csv"
 
-connect = mysql.connector(host = "localhost", user = "root", password = "password123", database = "NBAPlayers")
+connect = mysql.connector.connect(host = "localhost", user = "root", password = "password123", database = "NBAPlayers")
 
-df = pd.read_csv(csv)
+df = pd.read_csv(csv, low_memory = False)
 
 cursor = connect.cursor()
 
@@ -21,9 +21,9 @@ cursor.execute("""
                FG INT,
                FGA INT,
                FGP DOUBLE,
-               3P INT,
-               3PA INT,
-               3PP DOUBLE,
+               THREEP INT,
+               THREEPA INT,
+               THREEPP DOUBLE,
                FT INT,
                FTA INT,
                FTP DOUBLE,
@@ -40,15 +40,21 @@ cursor.execute("""
                PlusMinus INT
                )
                """)
-data = [tuple(pd.isna(value) for value in row) for row in df.itertuples(index = False, name = None)]
+# create nothing row
+data = []
+for row in df.itertuples(index = False, name = None):
+    if row[3] != "Reserves":
+        if not isinstance(row[5], str) or pd.isna(row[5]):
+
+            data.append(row)
 
 cursor.executemany("""
     INSERT INTO season2425 (
         date, team, opponent, player, minutes,
-        FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP,
+        FG, FGA, FGP, THREEP, THREEPA, THREEPP, FT, FTA, FTP,
         ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc, PlusMinus
     ) VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     )
 """, data)
 
@@ -62,5 +68,5 @@ connect.close()
 
 
 
-# You need to convert minutes to double from string
+
 
