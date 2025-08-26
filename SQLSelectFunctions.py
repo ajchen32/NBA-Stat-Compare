@@ -8,3 +8,13 @@ import mysql.connector
 # "Option Number" - this is local to a players team and is determined by their ppg over a given period relative to their teammates (highest scoring is option 1)
 # "Defensive Ranking" - this is of all 32 nba teams over a given time period determined by FG% and modified for 3P%. The modification is for
 # increased value of 3 - pointer. Points scored are not directly evaluated because that is also impacted by the pace of a team's offense. 
+
+def modifyDateRange():
+    return 
+
+def predictPlayer():
+    return 
+
+def executeSearch():
+    return
+
