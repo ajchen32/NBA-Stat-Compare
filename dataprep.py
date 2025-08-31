@@ -129,5 +129,5 @@ for i in range(0,len(testdf_numpy),6):
         test_y = np.vstack((test_y, testdf_numpy[i+5]))
 
 # save the numpy arrays for future use::::
-np.savez("NBA-Stat-Compare/trainandtest_nparrays.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y )
+np.savez("NBA-Stat-Compare/trainandtest_nparrays.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y ) 
 
