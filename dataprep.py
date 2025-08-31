@@ -114,19 +114,19 @@ test_y = None
 
 for i in range(0,len(traindf_numpy),6):
     if train_x is None:
-        train_x = traindf_numpy[0:6].copy()
-        train_y = traindf_numpy[6].copy()
+        train_x = [traindf_numpy[0:5].copy()]
+        train_y = [traindf_numpy[5].copy()]
     else:
-        train_x = np.vstack((train_x, traindf_numpy[i:i+5]))
-        train_y = np.vstack((train_y, traindf_numpy[i+5]))
+        train_x = np.vstack((train_x, [traindf_numpy[i:i+5]]))
+        train_y = np.vstack((train_y, [traindf_numpy[i+5]]))
     
 for i in range(0,len(testdf_numpy),6):
     if test_x is None:
-        test_x = testdf_numpy[0:6].copy()
-        test_y = testdf_numpy[6].copy()
+        test_x = [testdf_numpy[0:5].copy()]
+        test_y = [testdf_numpy[5].copy()]
     else:
-        test_x = np.vstack((test_x, testdf_numpy[i:i+5]))
-        test_y = np.vstack((test_y, testdf_numpy[i+5]))
+        test_x = np.vstack((test_x, [testdf_numpy[i:i+5]]))
+        test_y = np.vstack((test_y, [testdf_numpy[i+5]]))
 
 # save the numpy arrays for future use::::
 np.savez("NBA-Stat-Compare/trainandtest_nparrays.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y ) 
