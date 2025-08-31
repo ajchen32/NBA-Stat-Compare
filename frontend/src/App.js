@@ -11,7 +11,7 @@ function App() {
     console.log("Date 1:", date1);
     console.log("Date 2:", date2);
     // later send this data to backend
-  };
+  }; 
 
   return (
     <div className="p-6 max-w-lg mx-auto">
