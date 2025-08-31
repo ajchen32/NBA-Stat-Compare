@@ -94,16 +94,16 @@ for i in range(len(test_df)):
 # 5 of these games are x val, and 1 is the y val
 
 # one hot encode the player names
-traindf_encoded = pd.get_dummies(train_df, columns=['opponent', 'player', 'future-opponent'], drop_first =True)
+traindf_encoded = pd.get_dummies(train_df, columns=['opponent', 'future-opponent'], drop_first =True)
 saved_onehot_cols = traindf_encoded.columns.tolist()
 pd.Series(saved_onehot_cols).to_csv("NBA-Stat-Compare/team_columns.csv", index = False, header = False)
 
-testdf_encoded = pd.get_dummies(test_df, columns = ['opponent', 'player', 'future-opponent'], drop_first = True).reindex(columns=traindf_encoded.columns, fill_value=0)
+testdf_encoded = pd.get_dummies(test_df, columns = ['opponent', 'future-opponent'], drop_first = True).reindex(columns=traindf_encoded.columns, fill_value=0)
 
 # normalize the non-binary stats
 scaler = MinMaxScaler()
-traindf_encoded.drop(columns=['date'], inplace=True)
-testdf_encoded.drop(columns = ['date'], inplace = True)
+traindf_encoded.drop(columns=['date', 'player'], inplace=True)
+testdf_encoded.drop(columns = ['date', 'player'], inplace = True)
 traindf_numpy = scaler.fit_transform(traindf_encoded)
 testdf_numpy = scaler.fit_transform(testdf_encoded)
 
