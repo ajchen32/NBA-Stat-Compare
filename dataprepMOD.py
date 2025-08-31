@@ -14,13 +14,13 @@ connect = mysql.connector.connect(host = "localhost", user = "root", password = 
 cursor = connect.cursor()
 
 # create pandas df with all players sorted by name and date
-train_query  = "SELECT date, opponent, player, FG, FGA, FGP, THREEP, THREEPA, THREEPP, FT, FTA, FTP, ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc, PlusMinus FROM season2425 WHERE date < %s ORDER BY player, date"
+train_query  = "SELECT date, opponent, player, FG, FGA, THREEP, THREEPA, FT, FTA, ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc FROM season2425 WHERE date < %s AND FG IS NOT NULL ORDER BY player, date"
 cursor.execute(train_query, (divide_date_str,) )
 fetch = cursor.fetchall()
 column_names = [desc[0] for desc in cursor.description]
 train_df = pd.DataFrame(fetch, columns = column_names)
 
-test_query = "SELECT date, opponent, player, FG, FGA, FGP, THREEP, THREEPA, THREEPP, FT, FTA, FTP, ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc, PlusMinus FROM season2425 AS s1 WHERE date >= %s AND EXISTS(SELECT DISTINCT s2.player FROM season2425 AS s2 WHERE s2.date < %s AND s2.player = s1.player) ORDER BY player, date"
+test_query = "SELECT date, opponent, player, FG, FGA, THREEP, THREEPA, FT, FTA, ORB, DRB, TRB, AST, STL, BLK, TOV, PF, PTS, GmSc FROM season2425 AS s1 WHERE date >= %s AND FG IS NOT NULL AND EXISTS(SELECT DISTINCT s2.player FROM season2425 AS s2 WHERE s2.date < %s AND s2.player = s1.player) ORDER BY player, date"
 cursor.execute(test_query, (divide_date_str,divide_date_str) )
 fetch = cursor.fetchall()
 column_names = [desc[0] for desc in cursor.description]
@@ -88,7 +88,9 @@ for i in range(len(test_df)):
     test_df.at[i, 'future-opponent'] = test_df.at[i + 5 - (i%6), 'opponent']
 
 
+nan_cols = train_df.columns[train_df.isna().any()].tolist()
 
+print("Columns with NaN:", nan_cols)
 # need a train_x, train_y, test_x, test_y
 # iterate through whole df and make sure that each player has %6 games, 
 # 5 of these games are x val, and 1 is the y val
@@ -105,7 +107,15 @@ scaler = MinMaxScaler()
 traindf_encoded.drop(columns=['date', 'player'], inplace=True)
 testdf_encoded.drop(columns = ['date', 'player'], inplace = True)
 traindf_numpy = scaler.fit_transform(traindf_encoded)
-testdf_numpy = scaler.fit_transform(testdf_encoded)
+testdf_numpy = scaler.transform(testdf_encoded)
+
+print(np.isnan(traindf_numpy).any(), np.isnan(testdf_numpy).any())
+
+nan_rows_mask = np.isnan(traindf_numpy).any(axis=1)
+
+# Select only rows with NaN
+nan_rows = traindf_numpy[nan_rows_mask]
+print(nan_rows)
 
 train_x = None
 train_y = None
@@ -129,6 +139,6 @@ for i in range(0,len(testdf_numpy),6):
         test_y = np.vstack((test_y, [testdf_numpy[i+5]]))
 
 # save the numpy arrays for future use::::
-np.savez("NBA-Stat-Compare/trainandtest_nparrays.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y ) 
+np.savez("NBA-Stat-Compare/trainandtest_nparraysMOD.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y ) 
 
 # make tensors in separate file

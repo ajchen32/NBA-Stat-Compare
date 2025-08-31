@@ -5,12 +5,21 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import TensorDataset, DataLoader
 
+# original or modded
 data = np.load('NBA-Stat-Compare/trainandtest_nparrays.npz')
+data = np.load('NBA-Stat-Compare/trainandtest_nparraysMOD.npz')
+
+
+
+
+
 train_x = data['train_x']
 train_y = data['train_y']
 test_x = data['test_x']
 test_y = data['test_y']
 
+print(np.isnan(train_x).any(), np.isnan(train_y).any())
+print(np.isnan(test_x).any(), np.isnan(test_y).any())
 
 trainx_tensor = torch.tensor(train_x, dtype=torch.float32)
 trainy_tensor = torch.tensor(train_y, dtype=torch.float32)
@@ -58,6 +67,7 @@ for e in range(epochs):
         y_pred = my_model(ep_x)
         loss = loss_model(y_pred, ep_y)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(my_model.parameters(), max_norm=1.0)
         optimizer.step()
 
 
@@ -75,39 +85,3 @@ for e in range(epochs):
 
 
 
-# Define the LSTM Model
-# class BasketballLSTM(nn.Module):
-#     def __init__(self, input_size=4, hidden_layer_size=50, output_size=1):
-#         super(BasketballLSTM, self).__init__()
-#         self.lstm = nn.LSTM(input_size, hidden_layer_size)
-#         self.linear = nn.Linear(hidden_layer_size, output_size)
-    
-#     def forward(self, x):
-#         lstm_out, _ = self.lstm(x)
-#         predictions = self.linear(lstm_out[:, -1, :])
-#         return predictions
-
-# # Instantiate the model, loss function, and optimizer
-# model = BasketballLSTM(input_size=4, hidden_layer_size=50, output_size=1)
-# loss_function = nn.MSELoss()
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-# # Training the model
-# epochs = 200
-# for epoch in range(epochs):
-#     model.train()
-#     y_pred = model(X)
-#     loss = loss_function(y_pred, y)
-#     optimizer.zero_grad()
-#     loss.backward()
-#     optimizer.step()
-    
-#     if (epoch + 1) % 20 == 0:
-#         print(f"Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}")
-
-# # Making predictions
-# model.eval()
-# with torch.no_grad():
-#     predictions = model(X)
-#     predictions = predictions.detach().numpy()
-#     print(f"Predicted points for the next game: {predictions}")
