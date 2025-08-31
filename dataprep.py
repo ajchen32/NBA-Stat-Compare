@@ -131,3 +131,4 @@ for i in range(0,len(testdf_numpy),6):
 # save the numpy arrays for future use::::
 np.savez("NBA-Stat-Compare/trainandtest_nparrays.npz", train_x = train_x, train_y = train_y, test_x = test_x, test_y = test_y ) 
 
+# make tensors in separate file
