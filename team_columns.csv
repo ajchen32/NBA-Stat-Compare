@@ -2,13 +2,10 @@ date
 player
 FG
 FGA
-FGP
 THREEP
 THREEPA
-THREEPP
 FT
 FTA
-FTP
 ORB
 DRB
 TRB
@@ -19,7 +16,6 @@ TOV
 PF
 PTS
 GmSc
-PlusMinus
 opponent_BOS
 opponent_BRK
 opponent_CHI
