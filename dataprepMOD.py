@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import mysql.connector
 from datetime import date
+import joblib
 
 divide_date = date(2025, 3, 15)
 divide_date_str = divide_date.strftime('%Y-%m-%d')
@@ -108,6 +109,9 @@ traindf_encoded.drop(columns=['date', 'player'], inplace=True)
 testdf_encoded.drop(columns = ['date', 'player'], inplace = True)
 traindf_numpy = scaler.fit_transform(traindf_encoded)
 testdf_numpy = scaler.transform(testdf_encoded)
+
+joblib.dump(scaler, "NBA-Stat-Compare/scalerweights.pkl")
+
 
 print(np.isnan(traindf_numpy).any(), np.isnan(testdf_numpy).any())
 
