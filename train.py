@@ -4,14 +4,9 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import TensorDataset, DataLoader
+import joblib
 
-# original or modded
-data = np.load('NBA-Stat-Compare/trainandtest_nparrays.npz')
 data = np.load('NBA-Stat-Compare/trainandtest_nparraysMOD.npz')
-
-
-
-
 
 train_x = data['train_x']
 train_y = data['train_y']
@@ -56,9 +51,13 @@ hidden_layer = 64
 output_size = trainy_tensor.shape[1]
 num_layers = 1
 
+print(input_size, hidden_layer, output_size, num_layers)
+
 my_model = LSTMModel(input_size, hidden_layer, output_size, num_layers)
 loss_model = nn.MSELoss()
 optimizer = torch.optim.Adam(my_model.parameters(), lr = .001)
+
+scaler_y = joblib.load("NBA-Stat-Compare/scalerweights.pkl")
 
 epochs = 50
 for e in range(epochs):
@@ -78,10 +77,24 @@ for e in range(epochs):
     if (e+1) % 10 == 0:
         print(f"Epoch {e+1}, Train Loss: {loss.item():.4f}, Test Loss: {test_loss.item():.4f}")
 
+        # Prints out results back
+
+        batch_x, batch_y = next(iter(test_loader))  # grab one test batch
+        y_pred_scaled = my_model(batch_x).detach().cpu().numpy()
+        y_true_scaled = batch_y.detach().cpu().numpy()
+
+        # inverse transform (reshape to 2D for scaler)
+        y_pred_orig = scaler_y.inverse_transform(y_pred_scaled)
+        y_true_orig = scaler_y.inverse_transform(y_true_scaled)
+
+        print("Sample predictions (original scale):")
+        for i in range(min(5, len(y_pred_orig))):
+            print(f"  Pred: {y_pred_orig[i][0]:.2f}, Actual: {y_true_orig[i][0]:.2f}")
 
 
+# It works but not optimized yet 
 
-
+torch.save(my_model.state_dict(), "NBA-Stat-Compare/model.pth")
 
 
 
