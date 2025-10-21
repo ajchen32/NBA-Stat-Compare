@@ -1,5 +1,5 @@
 # NBA-Stat-Compare
-
+*****I've stopped pushing here to keep weights private for the time being*****
 WIP -> The project implements a simple LSTM seq2seq model to predict future player statlines based on the most recent 5 stat lines.
 
 The goal is for a user to be able to select a player and the opposing team and for the model to return a predicitve statline.
